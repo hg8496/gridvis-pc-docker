@@ -7,8 +7,7 @@ run     apt-get update
 # Install vnc, xvfb in order to create a 'fake' display and firefox
 run     apt-get install -y x11vnc xvfb wget
 run     mkdir /.vnc
-run     wget http://gridvis.janitza.de/download/5.0.1/GridVis-5.0.1-64bit.sh
-run     sh GridVis-5.0.1-64bit.sh -q
+run     wget -O GridVis.sh http://gridvis.janitza.de/download/5.0.1/GridVis-5.0.1-64bit.sh && sh GridVis.sh -q && rm GridVis.sh && ln -s /opt/GridVisData/license2-pc.lic /usr/local/GridVis/license2.lic
 
 volume ["/opt/GridVisProjects"]
 # Setup a password
