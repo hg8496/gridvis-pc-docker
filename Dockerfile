@@ -1,17 +1,28 @@
-# Gridvis over VNC
+FROM ubuntu
 
-from    ubuntu
+ENV VERSION 7.1.10
 
-run     apt-get update
+RUN apt-get update \
+    && apt-get install -y xrdp xvfb wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN wget -q -O GridVis.sh http://gridvis.janitza.de/download/$VERSION/GridVis-$VERSION-64bit.sh \
+    && sh GridVis.sh -q \
+    && rm GridVis.sh \
+    && ln -s /opt/GridVisData/license2-pc.lic /usr/local/GridVis/license2.lic
 
-# Install vnc, xvfb in order to create a 'fake' display and firefox
-run     apt-get install -y x11vnc xvfb wget
-run     mkdir /.vnc
-run     wget -O GridVis.sh http://gridvis.janitza.de/download/5.0.2/GridVis-5.0.2-64bit.sh && sh GridVis.sh -q && rm GridVis.sh && ln -s /opt/GridVisData/license2-pc.lic /usr/local/GridVis/license2.lic
+RUN adduser --disabled-password --gecos "" gridvis
+RUN adduser gridvis sudo
+RUN adduser gridvis users
+RUN echo "gridvis:gridvispwd" | chpasswd
 
-volume ["/opt/GridVisProjects"]
-# Setup a password
-run     x11vnc -storepasswd 1234 ~/.vnc/passwd
-# Autostart firefox (might not be the best way to do it, but it does the trick)
-run     bash -c 'echo "/usr/local/GridVis/bin/gridvis" >> /.bashrc'
-cmd     x11vnc -forever -usepw -create
+ADD xrdp.ini /etc/xrdp/
+ADD start.sh /
+COPY xsession /home/gridvis/.xsession
+
+CMD /start.sh
+
+# for RDP
+EXPOSE 3389
+
+VOLUME ["/opt/GridVisProjects"]
