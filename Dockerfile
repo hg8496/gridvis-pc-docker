@@ -1,6 +1,6 @@
 FROM ubuntu
 
-ENV VERSION 7.1.10
+ENV VERSION 7.3.3
 
 RUN apt-get update \
     && apt-get install -y xrdp xvfb wget \
